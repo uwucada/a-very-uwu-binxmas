@@ -88,7 +88,7 @@ well, in more complex cases we may want to write some pwndebug scripts in python
 
 i can't count to 80 so i'm going to write python
 
-one note here is that we have to reformat the address into a friendly hex format by splitting every two characters into a byte pair, and then we have to reverse it because we're in little endian (take note of this but don't worry too much about it atm).
+one note here is that we have to reformat the address into a friendly hex format by splitting every two characters into a byte pair, and then we have to reverse it because we're in little endian (take note of this but don't worry too much about it atm - it means the bytes are stored in reverse order).
 
 ![exploit](/1-yooltide-overflow/writeup/attachments/exploit.png)
 
@@ -110,4 +110,7 @@ it's pretty neat though, isn't it? because we overwrite the _return_ address of 
 4. function _returns_ and runs the print_flag function anyway 
 5. crash 
 
+the crash here is normal and expected for this type of bug, so don't panic if you see a segfault, in this case we're going for memory corruption so it's actually a good thing! 
+
 hope you'll join me next time when we exfil heaps of presents from yuma's spooky cauldron 😎
+
