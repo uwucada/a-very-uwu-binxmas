@@ -45,8 +45,11 @@ if we're looking at a disassembly of a binary, which we'll do later, it'll look 
 ```
 get_password();
 ; var char *s @ stack - 0x48
-0x004012f5      push    rbp < return pointer 
-0x004012f6      mov     rbp, rsp < saved base pointer
+0x004012f5      push    rbp < save callers base pointer  
+0x004012f6      mov     rbp, rsp < set new base pointer
+; u wont see the actual return pointer get written because
+;  its actually written to the stack before the function
+;  prologue begins, by whatever calls the function
 ```
 
 the gold standard here would be to rewrite the return address of our function so that when our function returns, instead of returning back to where it was going to return initially, we can get it to execute _a different function_. 
