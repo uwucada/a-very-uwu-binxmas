@@ -42,7 +42,7 @@ these gadgets themselves are just little chunks of machine code that often nobod
 
 you can kinda think about this similarly to the first stack overflow we did in challenge 1, where we forced the app to ignore an auth check, it's not normally meant to do that, but what we have to do here is a little more complex. 
 
-in this case, print_flag requires an argument, we can't just jump there, it'll fail, what we really need is a formal call to the print_flag function that passes the secret key we need to decrypt the flag. if you look at the source, there's a global variable `secret_key` that holds the xor key - we need to pass its address to print_flag.
+in this case, print_flag requires an argument, we can't just jump there, it'll fail, what we really need is a formal call to the print_flag function that passes the secret key we need to decrypt the flag. if you look at the source, there's a global variable `secret_key` that holds the xor key - we need to pass it to print_flag.
 
 so let's write one. 
 
@@ -71,7 +71,7 @@ the first, `pop %rdi`: this means that we'll `pop` a value off the stack and pla
 
 we haven't really touched on registers before so lets do so here quick:
 
-registers are little blocks of easily accessible memory used to momentarily store things by the CPU. many registers are general-purpose and are just kinda used to store whatever, but some, including `rdi` has a very specific fuction (in Linux x64). in Linux x64, this register holds the first argument to a function. whenever a function is called, if it accepts an argument, it'll pull it from `rdi`. registers are super small, and defintely not meant to store a whole ton of data, so they're usually used for stack data (as opposed to heap data).
+registers are little blocks of super duper fast storage on the CPU used to momentarily store things by the CPU. many registers are general-purpose and are just kinda used to store whatever, but some, including `rdi`, have a very specific fuction (in Linux x64). in Linux x64, this register holds the first argument to a function. whenever a function is called, if it accepts an argument, it'll pull it from `rdi`. registers are super small, and defintely not meant to store a whole ton of data, so they're normally used to store pointers or small values rather than large data structures.
 
 so what value are we going to pop off the stack and into `rdi`? the `pop %rdi` instruction takes whatever value is currently at the top of the stack (at the stack pointer) and moves it into the `rdi` register. we'll use our overflow to place the address of the secret key on the stack, so when `pop %rdi` executes, it'll load that address into `rdi` as our function argument.
 
@@ -112,7 +112,7 @@ so we write our exploit.... and it fails.
 
 we haven't touched on binary security yet, but this is a pretty good time to do so. in all the previous challenges, we've been able to use the addresses we get from objdump quite easily, because they're hardcoded. if you look back at those, you'll see that we actually explicity have a -no-pie flag in the build script. 
 
-so what does PIE do? well, your operating system is running something called ASLR, which stands for "Address Space Layout Randomization". ASLR already randomizes where the stack and heap are loaded, but PIE (position independent executable) extends this to also randomize the base address of the executable's code and data sections at runtime, so the memory addresses are never identical between runs. 
+so what does PIE do? well, your operating system is running something called ASLR, which stands for "Address Space Layout Randomization". ASLR already randomizes where the stack and heap are loaded, but PIE (position independent executable) extends this to also randomize the base address where the executable is loaded in memory at runtime, so the memory addresses are never identical between runs. 
 
 notice how I say the base address? the offsets between different operations must stay consistent, otherwise the app won't run. when you compile an app with PIE enabled, it's basically telling the compiler to build the app such that it considers offsets between operations rather than using absolute base addresses, allowing the whole thing to be loaded anywhere in memory. 
 
